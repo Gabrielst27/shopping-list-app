@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-final theme = ThemeData(
+final darkTheme = ThemeData.dark().copyWith(
   colorScheme: ColorScheme.fromSeed(
+    seedColor: const Color.fromARGB(255, 147, 229, 250),
     brightness: Brightness.dark,
-    seedColor: Color.fromARGB(255, 3, 0, 32),
+    surface: const Color.fromARGB(255, 42, 51, 59),
   ),
+  scaffoldBackgroundColor: const Color.fromARGB(255, 50, 58, 60),
 );

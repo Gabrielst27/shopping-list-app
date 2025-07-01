@@ -11,6 +11,10 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(theme: theme, home: ShoppingListScreen());
+    return MaterialApp(
+      title: 'Compras',
+      theme: darkTheme,
+      home: ShoppingListScreen(),
+    );
   }
 }

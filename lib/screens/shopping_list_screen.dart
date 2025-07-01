@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_list/widgets/shopping_list.dart';
 
 class ShoppingListScreen extends StatelessWidget {
   const ShoppingListScreen({super.key});
@@ -7,8 +8,7 @@ class ShoppingListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Suas Compras')),
-      body: ListView(),
-      backgroundColor: Theme.of(context).colorScheme.onSecondary,
+      body: ShoppingList(),
     );
   }
 }
