@@ -11,8 +11,8 @@ final Map<ECategory, Color> categoryColors = {
   ECategory.meal: const Color.fromARGB(255, 165, 91, 22),
 };
 
-class ListItemModel {
-  ListItemModel({
+class GroceryItemModel {
+  GroceryItemModel({
     required this.name,
     required this.category,
     required this.quantity,

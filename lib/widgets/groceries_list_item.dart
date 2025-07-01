@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_list/model/list_item_model.dart';
+import 'package:shopping_list/model/grocery_item_model.dart';
 
-class ShoppingListItem extends StatelessWidget {
-  const ShoppingListItem({super.key, required this.item});
+class GroceriesListItem extends StatelessWidget {
+  const GroceriesListItem({super.key, required this.item});
 
-  final ListItemModel item;
+  final GroceryItemModel item;
 
   @override
   Widget build(BuildContext context) {
