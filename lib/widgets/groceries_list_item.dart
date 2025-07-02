@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:shopping_list/model/grocery_item_model.dart';
 
 class GroceriesListItem extends StatelessWidget {
-  const GroceriesListItem({super.key, required this.item});
+  const GroceriesListItem({super.key, required this.grocery});
 
-  final GroceryItemModel item;
+  final GroceryItemModel grocery;
 
   @override
   Widget build(BuildContext context) {
-    final itemColor = categoryColors[item.category];
     return Container(
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Row(
@@ -22,16 +21,16 @@ class GroceriesListItem extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: itemColor,
+                    color: grocery.category.color,
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 const SizedBox(width: 16),
-                Text(item.name),
+                Text(grocery.name),
               ],
             ),
           ),
-          Text(item.quantity.toString()),
+          Text(grocery.quantity.toString()),
         ],
       ),
     );
