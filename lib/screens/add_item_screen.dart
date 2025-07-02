@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shopping_list/widgets/add_item_form.dart';
 
-class AddItemScreen extends StatefulWidget {
+class AddItemScreen extends StatelessWidget {
   const AddItemScreen({super.key});
 
-  @override
-  State<AddItemScreen> createState() => _AddItemScreenState();
-}
-
-class _AddItemScreenState extends State<AddItemScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,8 +11,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
         title: const Text('Adicione um item'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Form(child: Text('Formulário para adicionar um item')),
+        padding: const EdgeInsets.all(16),
+        child: const AddItemForm(),
       ),
     );
   }

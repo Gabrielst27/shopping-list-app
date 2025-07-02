@@ -6,5 +6,3 @@ class Category {
   final String name;
   final Color color;
 }
-
-enum ECategory { drink, fruit, candy, salad, meal, meat, hygiene, other }
