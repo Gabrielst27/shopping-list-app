@@ -9,17 +9,27 @@ class AddItemForm extends StatefulWidget {
 }
 
 class _AddItemFormState extends State<AddItemForm> {
+  final _formKey = GlobalKey<FormState>();
+  void _saveItem() {
+    _formKey.currentState!.validate();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
       child: Column(
         children: [
           TextFormField(
             maxLength: 50,
             decoration: const InputDecoration(label: Text('Nome')),
+            onChanged: (value) => _formKey.currentState!.validate(),
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Por favor, insira o nome do item.';
+              if (value == null ||
+                  value.isEmpty ||
+                  value.trim().length <= 1 ||
+                  value.trim().length > 50) {
+                return 'Deve conter entre 2 e 50 caracteres.';
               }
               return null;
             },
@@ -30,10 +40,25 @@ class _AddItemFormState extends State<AddItemForm> {
             children: [
               Expanded(
                 child: TextFormField(
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     label: Text('Quantidade'),
+                    errorMaxLines: 3,
+                    errorStyle: TextStyle(
+                      fontSize: 12,
+                    ),
                   ),
                   initialValue: 1.toString(),
+                  onChanged: (value) => _formKey.currentState!.validate(),
+                  validator: (value) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        int.tryParse(value) == null ||
+                        int.tryParse(value)! <= 0) {
+                      return 'Deve ser um número inteiro positivo maior que 0.';
+                    }
+                    return null;
+                  },
                 ),
               ),
               const SizedBox(width: 32),
@@ -69,8 +94,14 @@ class _AddItemFormState extends State<AddItemForm> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(onPressed: () {}, child: const Text('Cancelar')),
-              ElevatedButton(onPressed: () {}, child: const Text('Salvar')),
+              TextButton(
+                onPressed: () {
+                  _formKey.currentState!.reset();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(onPressed: _saveItem, child: const Text('Salvar')),
             ],
           ),
         ],
