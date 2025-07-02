@@ -25,6 +25,28 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
     });
   }
 
+  void _removeItem(GroceryItemModel item) {
+    int groceryIndex = _groceryItems.indexOf(item);
+    setState(() {
+      _groceryItems.remove(item);
+    });
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 3),
+        content: Text('Item removido'),
+        action: SnackBarAction(
+          label: 'Desfazer',
+          onPressed: () {
+            setState(() {
+              _groceryItems.insert(groceryIndex, item);
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget content = Center(
@@ -34,7 +56,10 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
       ),
     );
     if (_groceryItems.isNotEmpty) {
-      content = GroceriesList(items: _groceryItems);
+      content = GroceriesList(
+        items: _groceryItems,
+        onDismiss: _removeItem,
+      );
     }
     return Scaffold(
       appBar: AppBar(
