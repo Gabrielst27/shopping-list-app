@@ -9,29 +9,18 @@ class GroceriesListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: grocery.category.color,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(grocery.name),
-              ],
-            ),
-          ),
-          Text(grocery.quantity.toString()),
-        ],
+      padding: EdgeInsets.all(8),
+      child: ListTile(
+        title: Text(grocery.name),
+        leading: Container(
+          width: 24,
+          height: 24,
+          color: grocery.category.color,
+        ),
+        trailing: Text(
+          grocery.quantity.toString(),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
       ),
     );
   }

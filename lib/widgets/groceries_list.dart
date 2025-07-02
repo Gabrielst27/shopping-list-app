@@ -9,7 +9,7 @@ class GroceriesList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: itemsDummy.length,
-      itemBuilder: (context, index) =>
+      itemBuilder: (ctx, index) =>
           GroceriesListItem(grocery: itemsDummy[index]),
     );
   }
