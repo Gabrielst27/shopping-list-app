@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories_dummy.dart';
 import 'package:shopping_list/model/category_model.dart';
+import 'package:shopping_list/model/grocery_item_model.dart';
 
 class AddItemForm extends StatefulWidget {
   const AddItemForm({super.key});
@@ -18,11 +19,12 @@ class _AddItemFormState extends State<AddItemForm> {
   void _saveItem() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      print(
-        'Item saved: '
-        'Name: $_enteredName, '
-        'Quantity: $_enteredQuantity, '
-        'Category: ${_selectedCategory.name}',
+      Navigator.of(context).pop(
+        GroceryItemModel(
+          name: _enteredName,
+          category: _selectedCategory,
+          quantity: _enteredQuantity,
+        ),
       );
     }
   }
