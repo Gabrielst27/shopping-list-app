@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories_dummy.dart';
+import 'package:shopping_list/model/category_model.dart';
 
 class AddItemForm extends StatefulWidget {
   const AddItemForm({super.key});
@@ -10,8 +11,20 @@ class AddItemForm extends StatefulWidget {
 
 class _AddItemFormState extends State<AddItemForm> {
   final _formKey = GlobalKey<FormState>();
+  String _enteredName = '';
+  int _enteredQuantity = 1;
+  Category _selectedCategory = categoriesDummy[0];
+
   void _saveItem() {
-    _formKey.currentState!.validate();
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      print(
+        'Item saved: '
+        'Name: $_enteredName, '
+        'Quantity: $_enteredQuantity, '
+        'Category: ${_selectedCategory.name}',
+      );
+    }
   }
 
   @override
@@ -23,7 +36,6 @@ class _AddItemFormState extends State<AddItemForm> {
           TextFormField(
             maxLength: 50,
             decoration: const InputDecoration(label: Text('Nome')),
-            onChanged: (value) => _formKey.currentState!.validate(),
             validator: (value) {
               if (value == null ||
                   value.isEmpty ||
@@ -33,6 +45,8 @@ class _AddItemFormState extends State<AddItemForm> {
               }
               return null;
             },
+            onChanged: (value) => _formKey.currentState!.validate(),
+            onSaved: (value) => _enteredName = value!.trim(),
           ),
           const SizedBox(height: 16),
           Row(
@@ -49,7 +63,6 @@ class _AddItemFormState extends State<AddItemForm> {
                     ),
                   ),
                   initialValue: 1.toString(),
-                  onChanged: (value) => _formKey.currentState!.validate(),
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
@@ -59,11 +72,19 @@ class _AddItemFormState extends State<AddItemForm> {
                     }
                     return null;
                   },
+                  onChanged: (value) => _formKey.currentState!.validate(),
+                  onSaved: (value) => _enteredQuantity = int.parse(value!),
                 ),
               ),
               const SizedBox(width: 32),
               Expanded(
                 child: DropdownButtonFormField(
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Selecione uma categoria.';
+                    }
+                    return null;
+                  },
                   items: [
                     for (final category in categoriesDummy)
                       DropdownMenuItem(
@@ -85,7 +106,8 @@ class _AddItemFormState extends State<AddItemForm> {
                         ),
                       ),
                   ],
-                  onChanged: (value) {},
+                  onChanged: (value) => _formKey.currentState!.validate(),
+                  onSaved: (value) => _selectedCategory = value as Category,
                 ),
               ),
             ],
