@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shopping_list/data/categories_dummy.dart';
+import 'package:shopping_list/environment.dart';
 import 'package:shopping_list/model/category_model.dart';
 import 'package:shopping_list/model/grocery_item_model.dart';
 
@@ -19,13 +23,43 @@ class _AddItemFormState extends State<AddItemForm> {
   void _saveItem() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      Navigator.of(context).pop(
-        GroceryItemModel(
-          name: _enteredName,
-          category: _selectedCategory,
-          quantity: _enteredQuantity,
-        ),
+      Uri url = Uri.https(
+        apiUrl
+            .split('https://')[1]
+            .replaceFirst('https://', '')
+            .trimRight()
+            .replaceAll(RegExp(r'/$'), ''),
+        'shooping-list.json',
       );
+      http
+          .post(
+            url,
+            headers: {
+              'Content-type': 'application/json',
+            },
+            body: json.encode({
+              'name': _enteredName,
+              'category': _selectedCategory.name,
+              'quantity': _enteredQuantity,
+            }),
+          )
+          .then((response) {
+            if (response.statusCode >= 400) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Erro ao salvar o item.'),
+                ),
+              );
+              return;
+            }
+          })
+          .catchError((error) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Erro desconhecido.'),
+              ),
+            );
+          });
     }
   }
 
