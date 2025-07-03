@@ -21,7 +21,7 @@ class _AddItemFormState extends State<AddItemForm> {
   void _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      Uri url = Uri.https(
+      final Uri url = Uri.https(
         apiUrl
             .split('https://')[1]
             .replaceFirst('https://', '')
