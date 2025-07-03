@@ -35,7 +35,7 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
       'shopping-list.json',
     );
     final response = await http.get(url);
-    if (response.statusCode.toString().startsWith('4')) {
+    if (response.statusCode >= 400) {
       if (!context.mounted) {
         return;
       }
@@ -45,6 +45,16 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
         ),
       );
       setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    if (response.body == null ||
+        response.body == 'null' ||
+        response.body.isEmpty ||
+        response.body == '{}') {
+      setState(() {
+        _groceryItems = [];
         _isLoading = false;
       });
       return;
