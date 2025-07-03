@@ -1,11 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopping_list/data/categories_dummy.dart';
 import 'package:shopping_list/environment.dart';
 import 'package:shopping_list/model/category_model.dart';
-import 'package:shopping_list/model/grocery_item_model.dart';
 
 class AddItemForm extends StatefulWidget {
   const AddItemForm({super.key});
@@ -20,7 +18,7 @@ class _AddItemFormState extends State<AddItemForm> {
   int _enteredQuantity = 1;
   Category _selectedCategory = categoriesDummy[0];
 
-  void _saveItem() {
+  void _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       Uri url = Uri.https(
@@ -31,35 +29,39 @@ class _AddItemFormState extends State<AddItemForm> {
             .replaceAll(RegExp(r'/$'), ''),
         'shooping-list.json',
       );
-      http
-          .post(
-            url,
-            headers: {
-              'Content-type': 'application/json',
-            },
-            body: json.encode({
-              'name': _enteredName,
-              'category': _selectedCategory.name,
-              'quantity': _enteredQuantity,
-            }),
-          )
-          .then((response) {
-            if (response.statusCode >= 400) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Erro ao salvar o item.'),
-                ),
-              );
-              return;
-            }
-          })
-          .catchError((error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Erro desconhecido.'),
-              ),
-            );
-          });
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: json.encode({
+          'name': _enteredName,
+          'category': _selectedCategory.name,
+          'quantity': _enteredQuantity,
+        }),
+      );
+      if (response.statusCode.toString().startsWith('4')) {
+        if (!context.mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao salvar item: ${response.statusCode}'),
+          ),
+        );
+      }
+      if (response.statusCode.toString().startsWith('2')) {
+        if (!context.mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Item adicionado com sucesso!'),
+          ),
+        );
+      }
+      _formKey.currentState!.reset();
+      setState(() {});
     }
   }
 
@@ -81,7 +83,6 @@ class _AddItemFormState extends State<AddItemForm> {
               }
               return null;
             },
-            onChanged: (value) => _formKey.currentState!.validate(),
             onSaved: (value) => _enteredName = value!.trim(),
           ),
           const SizedBox(height: 16),
@@ -108,7 +109,6 @@ class _AddItemFormState extends State<AddItemForm> {
                     }
                     return null;
                   },
-                  onChanged: (value) => _formKey.currentState!.validate(),
                   onSaved: (value) => _enteredQuantity = int.parse(value!),
                 ),
               ),
@@ -142,7 +142,7 @@ class _AddItemFormState extends State<AddItemForm> {
                         ),
                       ),
                   ],
-                  onChanged: (value) => _formKey.currentState!.validate(),
+                  onChanged: (value) {},
                   onSaved: (value) => _selectedCategory = value as Category,
                 ),
               ),
