@@ -15,6 +15,7 @@ class AddItemForm extends StatefulWidget {
 
 class _AddItemFormState extends State<AddItemForm> {
   final _formKey = GlobalKey<FormState>();
+  bool _isSending = false;
   String _enteredName = '';
   int _enteredQuantity = 1;
   Category _selectedCategory = categoriesDummy[0];
@@ -22,6 +23,9 @@ class _AddItemFormState extends State<AddItemForm> {
   void _saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      setState(() {
+        _isSending = true;
+      });
       final Uri url = Uri.https(
         apiUrl
             .split('https://')[1]
@@ -61,6 +65,9 @@ class _AddItemFormState extends State<AddItemForm> {
           ),
         );
         final Map<String, dynamic> responseData = json.decode(response.body);
+        setState(() {
+          _isSending = false;
+        });
         Navigator.of(context).pop(
           GroceryItemModel(
             id: responseData['name'],
@@ -161,13 +168,24 @@ class _AddItemFormState extends State<AddItemForm> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: () {
-                  _formKey.currentState!.reset();
-                  Navigator.of(context).pop();
-                },
+                onPressed: _isSending
+                    ? null
+                    : () {
+                        _formKey.currentState!.reset();
+                        Navigator.of(context).pop();
+                      },
                 child: const Text('Cancelar'),
               ),
-              ElevatedButton(onPressed: _saveItem, child: const Text('Salvar')),
+              ElevatedButton(
+                onPressed: _isSending ? null : _saveItem,
+                child: _isSending
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(),
+                      )
+                    : const Text('Salvar'),
+              ),
             ],
           ),
         ],
