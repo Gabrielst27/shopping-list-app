@@ -18,6 +18,7 @@ class GroceriesListScreen extends StatefulWidget {
 class _GroceriesListScreenState extends State<GroceriesListScreen> {
   List<GroceryItemModel> _groceryItems = [];
   bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -34,50 +35,56 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
           .replaceAll(RegExp(r'/$'), ''),
       'shopping-list.json',
     );
-    final response = await http.get(url);
-    if (response.statusCode >= 400) {
-      if (!context.mounted) {
+    try {
+      final response = await http.get(url);
+      if (response.statusCode >= 400) {
+        if (!context.mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar itens: ${response.statusCode}'),
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao carregar itens: ${response.statusCode}'),
-        ),
-      );
+      if (response.body == 'null' ||
+          response.body.isEmpty ||
+          response.body == '{}') {
+        setState(() {
+          _groceryItems = [];
+          _isLoading = false;
+        });
+        return;
+      }
+      final Map<String, dynamic> listData = json.decode(response.body);
+      final List<GroceryItemModel> loadedItems = [];
+      for (final data in listData.entries) {
+        final category = categoriesDummy.firstWhere(
+          (cat) => cat.name == data.value['category'],
+        );
+        loadedItems.add(
+          GroceryItemModel(
+            id: data.key,
+            name: data.value['name'],
+            category: category,
+            quantity: data.value['quantity'],
+          ),
+        );
+      }
       setState(() {
+        _groceryItems = loadedItems;
         _isLoading = false;
       });
-      return;
-    }
-    if (response.body == null ||
-        response.body == 'null' ||
-        response.body.isEmpty ||
-        response.body == '{}') {
+    } catch (error) {
       setState(() {
-        _groceryItems = [];
         _isLoading = false;
+        _error = 'Erro ao carregar itens. Tente novamente mais tarde.';
       });
-      return;
     }
-    final Map<String, dynamic> listData = json.decode(response.body);
-    final List<GroceryItemModel> loadedItems = [];
-    for (final data in listData.entries) {
-      final category = categoriesDummy.firstWhere(
-        (cat) => cat.name == data.value['category'],
-      );
-      loadedItems.add(
-        GroceryItemModel(
-          id: data.key,
-          name: data.value['name'],
-          category: category,
-          quantity: data.value['quantity'],
-        ),
-      );
-    }
-    setState(() {
-      _groceryItems = loadedItems;
-      _isLoading = false;
-    });
   }
 
   void _addItem() async {
@@ -156,6 +163,14 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
       content = GroceriesList(
         items: _groceryItems,
         onDismiss: _removeItem,
+      );
+    }
+    if (_error != null) {
+      content = Center(
+        child: Text(
+          _error!,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
       );
     }
     return Scaffold(
