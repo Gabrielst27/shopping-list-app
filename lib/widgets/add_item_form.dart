@@ -32,7 +32,7 @@ class _AddItemFormState extends State<AddItemForm> {
             .replaceFirst('https://', '')
             .trimRight()
             .replaceAll(RegExp(r'/$'), ''),
-        'shooping-list.json',
+        'shopping-list.json',
       );
       final response = await http.post(
         url,

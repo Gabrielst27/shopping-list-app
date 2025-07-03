@@ -32,9 +32,23 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
           .replaceFirst('https://', '')
           .trimRight()
           .replaceAll(RegExp(r'/$'), ''),
-      'shooping-list.json',
+      'shopping-list.json',
     );
     final response = await http.get(url);
+    if (response.statusCode.toString().startsWith('4')) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao carregar itens: ${response.statusCode}'),
+        ),
+      );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
     final Map<String, dynamic> listData = json.decode(response.body);
     final List<GroceryItemModel> loadedItems = [];
     for (final data in listData.entries) {
@@ -68,13 +82,13 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
     });
   }
 
-  void _removeItem(GroceryItemModel item) {
+  void _removeItem(GroceryItemModel item) async {
     int groceryIndex = _groceryItems.indexOf(item);
     setState(() {
       _groceryItems.remove(item);
     });
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
+    final snackBarController = ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 3),
         content: Text('Item removido'),
@@ -88,6 +102,32 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
         ),
       ),
     );
+    await snackBarController.closed;
+    if (!_groceryItems.contains(item)) {
+      final Uri url = Uri.https(
+        apiUrl
+            .split('https://')[1]
+            .replaceFirst('https://', '')
+            .trimRight()
+            .replaceAll(RegExp(r'/$'), ''),
+        'shopping-list/${item.id}.json',
+      );
+      final response = await http.delete(url);
+      if (response.statusCode.toString().startsWith('4')) {
+        if (!context.mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao remover item: ${response.statusCode}'),
+          ),
+        );
+        setState(() {
+          _groceryItems.insert(groceryIndex, item);
+        });
+        return;
+      }
+    }
   }
 
   @override
