@@ -52,14 +52,18 @@ class _GroceriesListScreenState extends State<GroceriesListScreen> {
     setState(() {
       _groceryItems = loadedItems;
     });
-    print(loadedItems);
   }
 
   void _addItem() async {
-    await Navigator.of(context).push<GroceryItemModel>(
+    final newItem = await Navigator.of(context).push<GroceryItemModel>(
       MaterialPageRoute(builder: (context) => const AddItemScreen()),
     );
-    _getItems();
+    if (newItem == null) {
+      return;
+    }
+    setState(() {
+      _groceryItems.add(newItem);
+    });
   }
 
   void _removeItem(GroceryItemModel item) {

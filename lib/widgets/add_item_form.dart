@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shopping_list/data/categories_dummy.dart';
 import 'package:shopping_list/environment.dart';
 import 'package:shopping_list/model/category_model.dart';
+import 'package:shopping_list/model/grocery_item_model.dart';
 
 class AddItemForm extends StatefulWidget {
   const AddItemForm({super.key});
@@ -59,9 +60,16 @@ class _AddItemFormState extends State<AddItemForm> {
             content: Text('Item adicionado com sucesso!'),
           ),
         );
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        Navigator.of(context).pop(
+          GroceryItemModel(
+            id: responseData['name'],
+            name: _enteredName,
+            category: _selectedCategory,
+            quantity: _enteredQuantity,
+          ),
+        );
       }
-      _formKey.currentState!.reset();
-      setState(() {});
     }
   }
 
